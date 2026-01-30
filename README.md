@@ -9,10 +9,9 @@ Endpoints:
 - GET /messages/:phone
 - GET /health
 
-Local dev with Docker:
-- Copy `.env.example` to `.env` and update `MONGO_URI` if not using `docker-compose`.
-- Using docker-compose: `docker compose up --build`
-- Without docker: install Node.js, set `MONGO_URI`, then `npm install` and `npm start`.
+Local dev:
+- Copy `.env.example` to `.env` and set `MONGO_URI` (use MongoDB Atlas or local MongoDB).
+- Install Node.js, then `npm install` and `npm start`.
 
 Deployment:
 - Use your hosting of choice (Render, Railway, Fly, etc.). Set environment variable `MONGO_URI` with your managed MongoDB.
