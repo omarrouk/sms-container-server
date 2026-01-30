@@ -2,11 +2,13 @@ const express = require('express');
 const router = express.Router();
 const Message = require('./models/Message');
 
-// POST /login - verifies static PIN = 2345
+// POST /login - verifies email and password from env
 router.post('/login', (req, res) => {
-  const { pin } = req.body;
-  if (pin === '2345') return res.status(200).json({ ok: true });
-  return res.status(401).json({ ok: false, error: 'invalid_pin' });
+  const { email, password } = req.body;
+  const envEmail = process.env.EMAIL;
+  const envPassword = process.env.PASSWORD;
+  if (email === envEmail && password === envPassword) return res.status(200).json({ ok: true });
+  return res.status(401).json({ ok: false, error: 'invalid_credentials' });
 });
 
 // POST /upload-messages - accepts array of messages and stores them
@@ -59,9 +61,47 @@ router.get('/messages/:phone', async (req, res) => {
   }
 });
 
-// GET /health
-router.get('/health', (req, res) => {
-  res.status(200).send('OK');
+// GET /all-messages - get all messages for dashboard
+router.get('/all-messages', async (req, res) => {
+  try {
+    const messages = await Message.find().sort({ timestamp: -1 }).lean();
+    res.json(messages);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
+// PUT /edit-message/:id - edit a message
+router.put('/edit-message/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+    const msg = await Message.findByIdAndUpdate(id, updates, { new: true });
+    if (!msg) return res.status(404).json({ error: 'message_not_found' });
+    res.json(msg);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
+// DELETE /delete-message/:id - delete a message
+router.delete('/delete-message/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const msg = await Message.findByIdAndDelete(id);
+    if (!msg) return res.status(404).json({ error: 'message_not_found' });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
+// GET /requests - placeholder, since logging is in console
+router.get('/requests', (req, res) => {
+  res.json({ message: 'Requests are logged in server console' });
 });
 
 module.exports = router;

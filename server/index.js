@@ -9,6 +9,12 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// Logging middleware
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url} - ${req.ip}`);
+  next();
+});
+
 // Serve web UI
 app.use('/', express.static(__dirname + '/../web'));
 
