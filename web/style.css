@@ -1,0 +1,7 @@
+body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+.panel { background: white; padding: 16px; border-radius: 8px; max-width: 720px; margin: 0 auto 12px; }
+.hidden { display: none; }
+#messages { max-height: 60vh; overflow: auto; border: 1px solid #eee; padding: 8px; }
+.message { margin: 6px 0; padding: 8px; border-radius: 6px; }
+.message.sent { background: #2b7cff; color: white; text-align: right; }
+.message.received { background: #eee; color: #111; text-align: left; }
