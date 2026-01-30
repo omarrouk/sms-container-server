@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const routes = require('./routes');
 const db = require('./db');
-const fetch = require('node-fetch');
 
 const app = express();
 app.use(cors());
@@ -35,6 +34,7 @@ async function start() {
   // internal self-requests. This is done inside the process and does not rely on external services.
   setInterval(async () => {
     try {
+      // Use Node's global fetch (available in Node 18+). If unavailable, this will throw.
       await fetch(`http://localhost:${PORT}/health`);
     } catch (err) {
       // ignore errors - this is best-effort
