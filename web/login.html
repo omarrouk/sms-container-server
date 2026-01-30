@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMS Container - Login</title>
+  <link rel="stylesheet" href="/login.css">
+</head>
+
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1>SMS Container</h1>
+        <p class="subtitle">Secure Message Management System</p>
+      </div>
+
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" placeholder="Enter your email" autocomplete="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password"
+            autocomplete="current-password" required />
+        </div>
+
+        <div id="errorMsg" class="error-message"></div>
+
+        <button type="submit" id="btnLogin" class="btn-login">
+          Sign In
+        </button>
+      </form>
+
+      <div class="login-footer">
+        <p>&copy; 2025 SMS Container. All rights reserved.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="/login.js"></script>
+</body>
+
+</html>

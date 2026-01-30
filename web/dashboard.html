@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SMS Container - Dashboard</title>
+  <link rel="stylesheet" href="/dashboard.css">
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <h1 class="header-title">SMS Container</h1>
+      <div class="header-actions">
+        <span id="userEmail" class="user-email"></span>
+        <button id="refreshBtn" class="btn-icon" title="Refresh">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2" />
+          </svg>
+        </button>
+        <button id="logoutBtn" class="btn-secondary">Sign Out</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Threads List View -->
+    <div id="threadsView" class="view">
+      <div class="content-header">
+        <h2>Message Threads</h2>
+        <span id="threadCount" class="count-badge">0 conversations</span>
+      </div>
+
+      <div id="threadsContainer" class="threads-container">
+        <div id="loadingThreads" class="loading">
+          <div class="spinner"></div>
+          <p>Loading conversations...</p>
+        </div>
+        <div id="noThreads" class="empty-state hidden">
+          <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          <h3>No conversations yet</h3>
+          <p>Messages will appear here when available</p>
+        </div>
+        <ul id="threadList" class="thread-list hidden"></ul>
+      </div>
+    </div>
+
+    <!-- Chat View -->
+    <div id="chatView" class="view hidden">
+      <div class="chat-header">
+        <button id="backBtn" class="btn-back">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          Back
+        </button>
+        <div class="chat-info">
+          <h2 id="chatTitle" class="chat-name">Contact</h2>
+          <p id="chatPhone" class="chat-phone"></p>
+        </div>
+      </div>
+
+      <div id="messagesContainer" class="messages-container">
+        <div id="messagesList" class="messages-list"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/dashboard.js"></script>
+</body>
+
+</html>

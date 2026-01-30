@@ -1,0 +1,427 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.gitignore
+docker-compose.yml
+Dockerfile
+package.json
+README.md
+server/db.js
+server/index.js
+server/models/Message.js
+server/routes.js
+web/app.js
+web/index.html
+web/style.css
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".gitignore">
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment
+.env
+.env.*
+
+# Build
+dist/
+build/
+
+# OS files
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+</file>
+
+<file path="docker-compose.yml">
+version: '3.8'
+services:
+  mongo:
+    image: mongo:6.0
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+  server:
+    build: .
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/sms_db
+      - PORT=4000
+    ports:
+      - "4000:4000"
+    depends_on:
+      - mongo
+volumes:
+  mongo-data:
+</file>
+
+<file path="Dockerfile">
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY . .
+ENV PORT=4000
+EXPOSE 4000
+CMD ["node", "server/index.js"]
+</file>
+
+<file path="package.json">
+{
+  "name": "sms-container-server",
+  "version": "1.0.0",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.0.4",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "node-fetch": "^3.4.1"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
+</file>
+
+<file path="README.md">
+SMS Container Server
+
+This project contains a simple Express API and a static web UI that uses the same API.
+
+Endpoints:
+- POST /login -> { pin }  (valid PIN is 2345)
+- POST /upload-messages -> { messages: [ ... ] }
+- GET /threads
+- GET /messages/:phone
+- GET /health
+
+Local dev with Docker:
+- Copy `.env.example` to `.env` and update `MONGO_URI` if not using `docker-compose`.
+- Using docker-compose: `docker compose up --build`
+- Without docker: install Node.js, set `MONGO_URI`, then `npm install` and `npm start`.
+
+Deployment:
+- Use your hosting of choice (Render, Railway, Fly, etc.). Set environment variable `MONGO_URI` with your managed MongoDB.
+- Ensure the process stays alive (the server itself runs an internal keep-alive ping to `/health` every 14s).
+
+Note about pushing to GitHub and hosting: I cannot create remote GitHub repositories or hosting accounts from this environment. Follow the steps in the root workspace README to create repos and deploy.
+</file>
+
+<file path="server/db.js">
+const mongoose = require('mongoose');
+
+async function connect(uri) {
+  try {
+    await mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    console.log('MongoDB connected');
+  } catch (err) {
+    console.error('MongoDB connection error', err);
+    process.exit(1);
+  }
+}
+
+module.exports = { connect };
+</file>
+
+<file path="server/index.js">
+require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const routes = require('./routes');
+const db = require('./db');
+const fetch = require('node-fetch');
+
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+
+// Serve web UI
+app.use('/', express.static(__dirname + '/../web'));
+
+app.use('/', routes);
+
+const PORT = process.env.PORT || 4000;
+
+async function start() {
+  const mongoUri = process.env.MONGO_URI;
+  if (!mongoUri) {
+    console.error('MONGO_URI not set in environment');
+    process.exit(1);
+  }
+
+  await db.connect(mongoUri);
+
+  app.listen(PORT, () => {
+    console.log(`Server listening on ${PORT}`);
+  });
+
+  // KEEP-ALIVE: internal periodic ping to /health every 14 seconds.
+  // Purpose: Prevent some hosting providers from putting the process to sleep by making
+  // internal self-requests. This is done inside the process and does not rely on external services.
+  setInterval(async () => {
+    try {
+      await fetch(`http://localhost:${PORT}/health`);
+    } catch (err) {
+      // ignore errors - this is best-effort
+    }
+  }, 14000);
+}
+
+start();
+</file>
+
+<file path="server/models/Message.js">
+const mongoose = require('mongoose');
+
+const MessageSchema = new mongoose.Schema({
+  phone: { type: String, required: true },
+  name: { type: String, default: null },
+  body: { type: String, required: true },
+  direction: { type: String, enum: ['sent','received'], required: true },
+  timestamp: { type: Date, required: true },
+});
+
+module.exports = mongoose.model('Message', MessageSchema);
+</file>
+
+<file path="server/routes.js">
+const express = require('express');
+const router = express.Router();
+const Message = require('./models/Message');
+
+// POST /login - verifies static PIN = 2345
+router.post('/login', (req, res) => {
+  const { pin } = req.body;
+  if (pin === '2345') return res.status(200).json({ ok: true });
+  return res.status(401).json({ ok: false, error: 'invalid_pin' });
+});
+
+// POST /upload-messages - accepts array of messages and stores them
+router.post('/upload-messages', async (req, res) => {
+  try {
+    const { messages } = req.body;
+    if (!Array.isArray(messages)) return res.status(400).json({ error: 'messages must be array' });
+
+    const docs = messages.map((m) => ({
+      phone: m.phone,
+      name: m.name || null,
+      body: m.body,
+      direction: m.direction,
+      timestamp: new Date(m.timestamp),
+    }));
+
+    await Message.insertMany(docs, { ordered: false });
+    return res.status(200).json({ ok: true });
+  } catch (err) {
+    console.error('upload error', err);
+    return res.status(500).json({ error: 'server_error' });
+  }
+});
+
+// GET /threads - return unique phone numbers with latest timestamp
+router.get('/threads', async (req, res) => {
+  try {
+    const results = await Message.aggregate([
+      { $sort: { timestamp: -1 } },
+      { $group: { _id: '$phone', name: { $first: '$name' }, last: { $first: '$timestamp' }, lastBody: { $first: '$body' } } },
+      { $project: { phone: '$_id', name: 1, last: 1, lastBody: 1, _id: 0 } },
+      { $sort: { last: -1 } }
+    ]);
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
+// GET /messages/:phone - return messages for phone sorted oldest->newest
+router.get('/messages/:phone', async (req, res) => {
+  try {
+    const phone = req.params.phone;
+    const messages = await Message.find({ phone }).sort({ timestamp: 1 }).lean();
+    res.json(messages);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'server_error' });
+  }
+});
+
+// GET /health
+router.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
+module.exports = router;
+</file>
+
+<file path="web/app.js">
+const apiBase = '';
+
+async function post(path, body) {
+  const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  return res;
+}
+
+async function getJson(path) {
+  const res = await fetch(path);
+  return res.json();
+}
+
+const loginBtn = document.getElementById('btnLogin');
+const pinInput = document.getElementById('pin');
+const loginMsg = document.getElementById('loginMsg');
+const threadsPanel = document.getElementById('threads');
+const threadList = document.getElementById('threadList');
+const loginPanel = document.getElementById('login');
+const chatPanel = document.getElementById('chat');
+const chatTitle = document.getElementById('chatTitle');
+const messagesDiv = document.getElementById('messages');
+const backBtn = document.getElementById('back');
+
+loginBtn.onclick = async () => {
+  const pin = pinInput.value.trim();
+  if (!pin) return;
+  const res = await post('/login', { pin });
+  if (res.status === 200) {
+    loginPanel.classList.add('hidden');
+    threadsPanel.classList.remove('hidden');
+    await loadThreads();
+  } else {
+    loginMsg.innerText = 'Invalid PIN';
+  }
+};
+
+backBtn.onclick = () => {
+  chatPanel.classList.add('hidden');
+  threadsPanel.classList.remove('hidden');
+};
+
+async function loadThreads() {
+  threadList.innerHTML = '';
+  const data = await getJson('/threads');
+  data.forEach(t => {
+    const li = document.createElement('li');
+    li.innerText = (t.name || t.phone) + ' — ' + new Date(t.last).toLocaleString();
+    li.onclick = () => openThread(t.phone, t.name);
+    threadList.appendChild(li);
+  });
+}
+
+async function openThread(phone, name) {
+  threadsPanel.classList.add('hidden');
+  chatPanel.classList.remove('hidden');
+  chatTitle.innerText = name || phone;
+  const messages = await getJson('/messages/' + encodeURIComponent(phone));
+  messagesDiv.innerHTML = '';
+  messages.forEach(m => {
+    const d = document.createElement('div');
+    d.className = 'message ' + (m.direction === 'sent' ? 'sent' : 'received');
+    d.innerText = m.body + '\n' + new Date(m.timestamp).toLocaleString();
+    messagesDiv.appendChild(d);
+  });
+}
+
+// Auto-refresh threads every 10s
+setInterval(loadThreads, 10000);
+</file>
+
+<file path="web/index.html">
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>SMS Container - Web</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="login" class="panel">
+        <h2>Login</h2>
+        <input id="pin" placeholder="Enter PIN (2345)" />
+        <button id="btnLogin">Login</button>
+        <div id="loginMsg"></div>
+      </div>
+
+      <div id="threads" class="panel hidden">
+        <h2>Threads</h2>
+        <ul id="threadList"></ul>
+      </div>
+
+      <div id="chat" class="panel hidden">
+        <button id="back">Back</button>
+        <h2 id="chatTitle"></h2>
+        <div id="messages"></div>
+      </div>
+    </div>
+    <script src="/app.js"></script>
+  </body>
+</html>
+</file>
+
+<file path="web/style.css">
+body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+.panel { background: white; padding: 16px; border-radius: 8px; max-width: 720px; margin: 0 auto 12px; }
+.hidden { display: none; }
+#messages { max-height: 60vh; overflow: auto; border: 1px solid #eee; padding: 8px; }
+.message { margin: 6px 0; padding: 8px; border-radius: 6px; }
+.message.sent { background: #2b7cff; color: white; text-align: right; }
+.message.received { background: #eee; color: #111; text-align: left; }
+</file>
+
+</files>
