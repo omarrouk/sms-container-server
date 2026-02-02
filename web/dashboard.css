@@ -355,7 +355,14 @@ body {
     background: #95a5a6;
 }
 
-/* Responsive Design */
+/* Tablet Responsive */
+@media (max-width: 900px) {
+    .thread-preview {
+        max-width: 350px;
+    }
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
     .header-content {
         padding: 12px 16px;
@@ -365,8 +372,26 @@ body {
         font-size: 18px;
     }
     
+    .header-actions {
+        gap: 8px;
+    }
+    
+    .user-email {
+        display: none;
+    }
+    
+    .btn-secondary {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
     .main-content {
-        padding: 16px;
+        padding: 12px;
+    }
+    
+    .view {
+        border-radius: 8px;
+        min-height: calc(100vh - 100px);
     }
     
     .content-header {
@@ -376,12 +401,21 @@ body {
         gap: 8px;
     }
     
+    .content-header h2 {
+        font-size: 18px;
+    }
+    
     .thread-item {
-        padding: 16px;
+        padding: 14px 16px;
+    }
+    
+    .thread-contact {
+        font-size: 15px;
     }
     
     .thread-preview {
-        max-width: 250px;
+        max-width: 200px;
+        font-size: 13px;
     }
     
     .message {
@@ -389,12 +423,278 @@ body {
     }
     
     .chat-header {
-        padding: 16px;
+        padding: 14px 16px;
+        gap: 12px;
+    }
+    
+    .btn-back {
+        padding: 6px 10px;
+        font-size: 13px;
+    }
+    
+    .btn-back svg {
+        width: 16px;
+        height: 16px;
+    }
+    
+    .chat-name {
+        font-size: 16px;
+    }
+    
+    .chat-phone {
+        font-size: 12px;
     }
     
     .messages-container {
-        padding: 16px;
-        max-height: calc(100vh - 200px);
+        padding: 12px;
+        max-height: calc(100vh - 180px);
+    }
+    
+    .message {
+        padding: 10px 14px;
+    }
+    
+    .message-body {
+        font-size: 14px;
+    }
+    
+    .message-time {
+        font-size: 10px;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .header-content {
+        padding: 10px 12px;
+    }
+    
+    .header-title {
+        font-size: 16px;
+    }
+    
+    .btn-icon {
+        padding: 6px;
+    }
+    
+    .btn-icon svg {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .btn-secondary {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .main-content {
+        padding: 8px;
+    }
+    
+    .content-header {
+        padding: 12px;
+    }
+    
+    .content-header h2 {
+        font-size: 16px;
+    }
+    
+    .count-badge {
+        padding: 4px 10px;
+        font-size: 11px;
+    }
+    
+    .thread-item {
+        padding: 12px;
+    }
+    
+    .thread-contact {
+        font-size: 14px;
+        margin-bottom: 2px;
+    }
+    
+    .thread-preview {
+        max-width: 160px;
+        font-size: 12px;
+    }
+    
+    .thread-time {
+        font-size: 11px;
+    }
+    
+    .chat-header {
+        padding: 12px;
+        gap: 10px;
+    }
+    
+    .btn-back {
+        padding: 6px 8px;
+        font-size: 12px;
+        gap: 4px;
+    }
+    
+    .btn-back svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    .chat-name {
+        font-size: 15px;
+    }
+    
+    .messages-container {
+        padding: 10px;
+        max-height: calc(100vh - 160px);
+    }
+    
+    .messages-list {
+        gap: 8px;
+    }
+    
+    .message {
+        max-width: 90%;
+        padding: 8px 12px;
+        border-radius: 10px;
+    }
+    
+    .message.sent {
+        border-bottom-right-radius: 3px;
+    }
+    
+    .message.received {
+        border-bottom-left-radius: 3px;
+    }
+    
+    .message-body {
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+    
+    .loading {
+        padding: 40px 16px;
+    }
+    
+    .spinner {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .empty-state {
+        padding: 40px 16px;
+    }
+    
+    .empty-state svg {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .empty-state h3 {
+        font-size: 16px;
+    }
+    
+    .empty-state p {
+        font-size: 13px;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+    .header-title {
+        font-size: 14px;
+    }
+    
+    .thread-preview {
+        max-width: 130px;
+    }
+    
+    .message {
+        max-width: 92%;
+    }
+}
+
+/* Landscape phones */
+@media (max-height: 500px) and (orientation: landscape) {
+    .header-content {
+        padding: 8px 16px;
+    }
+    
+    .main-content {
+        padding: 8px;
+    }
+    
+    .view {
+        min-height: calc(100vh - 80px);
+    }
+    
+    .messages-container {
+        max-height: calc(100vh - 140px);
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #1a1a2e;
+    }
+    
+    .view {
+        background: #16213e;
+    }
+    
+    .content-header {
+        border-color: #2a2a4a;
+    }
+    
+    .content-header h2 {
+        color: #ffffff;
+    }
+    
+    .count-badge {
+        background: #2a2a4a;
+        color: #a0a0a0;
+    }
+    
+    .thread-item {
+        border-color: #2a2a4a;
+    }
+    
+    .thread-item:hover {
+        background: #1f3460;
+    }
+    
+    .thread-contact {
+        color: #ffffff;
+    }
+    
+    .thread-preview {
+        color: #a0a0a0;
+    }
+    
+    .chat-header {
+        border-color: #2a2a4a;
+    }
+    
+    .btn-back {
+        border-color: #3a3a5a;
+        color: #ffffff;
+    }
+    
+    .btn-back:hover {
+        background: #2a2a4a;
+    }
+    
+    .chat-name {
+        color: #ffffff;
+    }
+    
+    .message.received {
+        background: #2a2a4a;
+        color: #ffffff;
+    }
+    
+    .loading,
+    .empty-state {
+        color: #a0a0a0;
     }
 }
 

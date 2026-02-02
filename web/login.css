@@ -126,15 +126,84 @@ body {
 
 /* Responsive Design */
 @media (max-width: 480px) {
+    body {
+        padding: 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .login-container {
+        max-width: 100%;
+    }
+    
+    .login-card {
+        border-radius: 16px;
+    }
+    
     .login-header {
         padding: 30px 20px;
     }
     
     .login-header h1 {
-        font-size: 24px;
+        font-size: 22px;
+    }
+    
+    .subtitle {
+        font-size: 13px;
     }
     
     .login-form {
-        padding: 30px 20px;
+        padding: 24px 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group input {
+        padding: 12px 14px;
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+    
+    .btn-login {
+        padding: 14px;
+        font-size: 16px;
+    }
+    
+    .login-footer {
+        padding: 16px 20px;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+    .login-header h1 {
+        font-size: 20px;
+    }
+    
+    .login-header {
+        padding: 24px 16px;
+    }
+    
+    .login-form {
+        padding: 20px 16px;
+    }
+}
+
+/* Landscape phones */
+@media (max-height: 500px) and (orientation: landscape) {
+    body {
+        padding: 10px;
+    }
+    
+    .login-header {
+        padding: 20px;
+    }
+    
+    .login-form {
+        padding: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 16px;
     }
 }
